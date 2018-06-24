@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Done_GameController : MonoBehaviour
 {
@@ -10,40 +12,27 @@ public class Done_GameController : MonoBehaviour
 	public float startWait;
 	public float waveWait;
 	
-	public GUIText scoreText;
-	public GUIText restartText;
-	public GUIText gameOverText;
-	
-	private bool gameOver;
-	private bool restart;
+	public Text scoreText;
+	public Text gameOverText;
+    public GameObject restartButton;
+
+    private bool gameOver;
 	private int score;
 	
-	void Start ()
+	void Start()
 	{
 		gameOver = false;
-		restart = false;
-		restartText.text = "";
-		gameOverText.text = "";
+        restartButton.SetActive(false);
+        gameOverText.text = "";
 		score = 0;
 		UpdateScore ();
 		StartCoroutine (SpawnWaves ());
 	}
-	
-	void Update ()
-	{
-		if (restart)
-		{
-			if (Input.GetKeyDown (KeyCode.R))
-			{
-				Application.LoadLevel (Application.loadedLevel);
-			}
-		}
-	}
-	
-	IEnumerator SpawnWaves ()
+		
+	IEnumerator SpawnWaves()
 	{
 		yield return new WaitForSeconds (startWait);
-		while (true)
+		while(true)
 		{
 			for (int i = 0; i < hazardCount; i++)
 			{
@@ -55,29 +44,33 @@ public class Done_GameController : MonoBehaviour
 			}
 			yield return new WaitForSeconds (waveWait);
 			
-			if (gameOver)
+			if(gameOver)
 			{
-				restartText.text = "Press 'R' for Restart";
-				restart = true;
+                restartButton.SetActive(true);
 				break;
 			}
 		}
 	}
 	
-	public void AddScore (int newScoreValue)
+	public void AddScore(int newScoreValue)
 	{
 		score += newScoreValue;
-		UpdateScore ();
+		UpdateScore();
 	}
 	
-	void UpdateScore ()
+	void UpdateScore()
 	{
 		scoreText.text = "Score: " + score;
 	}
 	
-	public void GameOver ()
+	public void GameOver()
 	{
 		gameOverText.text = "Game Over!";
 		gameOver = true;
 	}
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(1);
+    }
 }

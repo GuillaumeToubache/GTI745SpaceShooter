@@ -16,12 +16,20 @@ public class Done_PlayerController : MonoBehaviour
 	public GameObject shot;
 	public Transform shotSpawn;
 	public float fireRate;
-	 
-	private float nextFire;
-	
-	void Update ()
+    public SimpleTouchPad touchPad;
+    public SimpleTouchAreaButton areaButton;
+
+    private float nextFire;
+    private Quaternion calibrationQuaternion;
+
+    void Start()
+    {
+        CalibrateAccelerometer();
+    }
+
+    void Update()
 	{
-		if (Input.GetButton("Fire1") && Time.time > nextFire) 
+		if (areaButton.CanFire() && Time.time > nextFire) 
 		{
 			nextFire = Time.time + fireRate;
 			Instantiate(shot, shotSpawn.position, shotSpawn.rotation);
@@ -29,13 +37,29 @@ public class Done_PlayerController : MonoBehaviour
 		}
 	}
 
-	void FixedUpdate ()
-	{
-		float moveHorizontal = Input.GetAxis ("Horizontal");
-		float moveVertical = Input.GetAxis ("Vertical");
+    //Used to calibrate the Iput.acceleration input
+    void CalibrateAccelerometer()
+    {
+        Vector3 accelerationSnapshot = Input.acceleration;
+        Quaternion rotateQuaternion = Quaternion.FromToRotation(new Vector3(0.0f, 0.0f, -1.0f), accelerationSnapshot);
+        calibrationQuaternion = Quaternion.Inverse(rotateQuaternion);
+    }
 
-		Vector3 movement = new Vector3 (moveHorizontal, 0.0f, moveVertical);
-		GetComponent<Rigidbody>().velocity = movement * speed;
+
+    //Get the 'calibrated' value from the Input
+    Vector3 FixAcceleration(Vector3 acceleration)
+    {
+        Vector3 fixedAcceleration = calibrationQuaternion * acceleration;
+        return fixedAcceleration;
+    }
+
+    void FixedUpdate()
+	{
+        Vector2 direction = touchPad.GetDirection();
+
+        Vector3 movement = new Vector3 (direction.x, 0.0f, direction.y);
+        
+        GetComponent<Rigidbody>().velocity = movement * speed;
 		
 		GetComponent<Rigidbody>().position = new Vector3
 		(
