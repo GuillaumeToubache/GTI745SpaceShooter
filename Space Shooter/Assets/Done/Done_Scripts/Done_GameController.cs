@@ -18,10 +18,14 @@ public class Done_GameController : MonoBehaviour
 
     private bool gameOver;
 	private int score;
-	
-	void Start()
+
+    void Start()
+    {
+    }
+
+    public void StartGame()
 	{
-		gameOver = false;
+        gameOver = false;
         restartButton.SetActive(false);
         gameOverText.text = "";
 		score = 0;
