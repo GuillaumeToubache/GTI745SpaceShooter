@@ -37,7 +37,6 @@ public class SimpleTouchPad : MonoBehaviour, IPointerDownHandler, IDragHandler, 
             Vector2 currentPosition = data.position;
             Vector2 directionRaw = currentPosition - origin;
             direction = directionRaw.normalized;
-            //Debug.Log(direction);
         }
     }
 

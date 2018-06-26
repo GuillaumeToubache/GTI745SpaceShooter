@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class Done_GameController : MonoBehaviour
 {
@@ -11,12 +12,15 @@ public class Done_GameController : MonoBehaviour
 	public float spawnWait;
 	public float startWait;
 	public float waveWait;
-    	
+    public List<GameObject> hazardArrayList;
+     	
 	public Text scoreText;
 	public Text gameOverText;
     public GameObject restartButton;
     public GameObject mainMenuButton;
-    
+    public Slider secondaryWeaponCharge;
+    public GameObject secondaryWeapon;
+
     private bool gameOver;
 	private int score;
     private bool isTouchPadActive;
@@ -35,6 +39,8 @@ public class Done_GameController : MonoBehaviour
         difficulty = PlayerPrefs.GetInt("difficulty", 1);
         gameOver = false;
         restartButton.SetActive(false);
+        secondaryWeapon.SetActive(false);
+        secondaryWeaponCharge.value = 0;
         mainMenuButton.SetActive(false);
         gameOverText.text = "";
 		score = 0;
@@ -58,15 +64,11 @@ public class Done_GameController : MonoBehaviour
 		{
 			for (int i = 0; i < hazardCount; i++)
 			{
-                Debug.Log(hazardCount);
                 GameObject hazard = hazards[Random.Range(0, hazardLength)];
-                if (difficulty == 0)
-                {
-                    hazard = hazards[0];
-                }
-				Vector3 spawnPosition = new Vector3 (Random.Range (-spawnValues.x, spawnValues.x), spawnValues.y, spawnValues.z);
+                hazardArrayList.Add(hazard);
+                Vector3 spawnPosition = new Vector3 (Random.Range (-spawnValues.x, spawnValues.x), spawnValues.y, spawnValues.z);
 				Quaternion spawnRotation = Quaternion.identity;
-				Instantiate (hazard, spawnPosition, spawnRotation);
+				Instantiate(hazard, spawnPosition, spawnRotation);
 				yield return new WaitForSeconds (spawnWait);
 			}
 			yield return new WaitForSeconds (waveWait);
@@ -82,7 +84,9 @@ public class Done_GameController : MonoBehaviour
 	
 	public void AddScore(int newScoreValue)
 	{
+        Debug.Log(newScoreValue);
 		score += newScoreValue;
+        Debug.Log(score);
 		UpdateScore();
 	}
 	
@@ -114,5 +118,23 @@ public class Done_GameController : MonoBehaviour
     public float GetAccelerometerValue()
     {
         return accelerometerValue;
+    }
+
+    public void DestroyAllHazards()
+    {
+        foreach (var hazard in GameObject.FindGameObjectsWithTag("Ship"))
+        {
+            Debug.Log(hazard.tag);
+            AddScore(20);
+            Destroy(hazard);
+        }
+        foreach (var hazard in GameObject.FindGameObjectsWithTag("Enemy"))
+        {
+            Debug.Log(hazard.tag);
+            AddScore(10);
+            Destroy(hazard);
+        }
+        secondaryWeaponCharge.value = 0;
+        secondaryWeapon.SetActive(false);
     }
 }

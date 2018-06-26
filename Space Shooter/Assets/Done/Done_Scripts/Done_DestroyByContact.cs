@@ -23,7 +23,7 @@ public class Done_DestroyByContact : MonoBehaviour
 
 	void OnTriggerEnter (Collider other)
 	{
-		if (other.tag == "Boundary" || other.tag == "Enemy")
+        if (other.tag == "Boundary" || other.tag == "Enemy" || other.tag == "Ship")
 		{
 			return;
 		}
@@ -33,13 +33,21 @@ public class Done_DestroyByContact : MonoBehaviour
 			Instantiate(explosion, transform.position, transform.rotation);
 		}
 
-		if (other.tag == "Player")
+        if (other.tag == "Player")
 		{
 			Instantiate(playerExplosion, other.transform.position, other.transform.rotation);
 			gameController.GameOver();
 		}
-		
-		gameController.AddScore(scoreValue);
+
+        if (scoreValue == 20) {
+            if (gameController.secondaryWeaponCharge.value == 4)
+            {
+                gameController.secondaryWeapon.SetActive(true);
+            }
+            gameController.secondaryWeaponCharge.value = gameController.secondaryWeaponCharge.value + 1;
+        }
+
+        gameController.AddScore(scoreValue);
 		Destroy (other.gameObject);
 		Destroy (gameObject);
 	}

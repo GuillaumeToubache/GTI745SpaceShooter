@@ -8,7 +8,6 @@ using System.Collections.Generic;
 public class MenuController : MonoBehaviour {
 
     public GameObject startGameButton;
-    public GameObject MainMenu;
     public ToggleGroup movementTypeRadio;
     public ToggleGroup difficultyRadio;
     public Slider accelerometerSlider;
@@ -16,7 +15,7 @@ public class MenuController : MonoBehaviour {
 
     void Start()
     {
-        accelerometerSlider.value = PlayerPrefs.GetFloat("accelerometer");
+        accelerometerSlider.value = PlayerPrefs.GetFloat("accelerometer") == 0 ? 1 : PlayerPrefs.GetFloat("accelerometer");
         UpdateAccelerometerSlider();
     }
 	
@@ -29,11 +28,6 @@ public class MenuController : MonoBehaviour {
             difficultyRadio.ActiveToggles().FirstOrDefault().ToString().Contains("Easy Radio") ? 0 : 2);
         PlayerPrefs.SetFloat("accelerometer", accelerometerSlider.value);
         SceneManager.LoadScene(1);
-    }
-
-    public void UpdateMovementType()
-    {
-        var f = movementTypeRadio.ActiveToggles().FirstOrDefault();
     }
 
     public void UpdateAccelerometerSlider()
