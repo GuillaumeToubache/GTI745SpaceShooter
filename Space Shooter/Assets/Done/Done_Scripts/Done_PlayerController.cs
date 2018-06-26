@@ -18,6 +18,7 @@ public class Done_PlayerController : MonoBehaviour
 	public float fireRate;
     public SimpleTouchPad touchPad;
     public SimpleTouchAreaButton areaButton;
+    public Done_GameController gameController;
 
     private float nextFire;
     private Quaternion calibrationQuaternion;
@@ -37,7 +38,7 @@ public class Done_PlayerController : MonoBehaviour
 		}
 	}
 
-    //Used to calibrate the Iput.acceleration input
+    //Used to calibrate the Input.acceleration input
     void CalibrateAccelerometer()
     {
         Vector3 accelerationSnapshot = Input.acceleration;
@@ -55,19 +56,27 @@ public class Done_PlayerController : MonoBehaviour
 
     void FixedUpdate()
 	{
-        Vector2 direction = touchPad.GetDirection();
+        Vector3 movement = new Vector3();
+        if (gameController.GetMovementType())
+        {
+            Vector2 direction = touchPad.GetDirection();
+            movement = new Vector3(direction.x, 0.0f, direction.y);
+        }
+        else {
+            Vector3 accelerationRaw = Input.acceleration * gameController.GetAccelerometerValue();
+            Vector3 acceleration = FixAcceleration(accelerationRaw);
+            movement = new Vector3(acceleration.x, 0.0f, acceleration.y);
+        }
 
-        Vector3 movement = new Vector3 (direction.x, 0.0f, direction.y);
-        
         GetComponent<Rigidbody>().velocity = movement * speed;
 		
 		GetComponent<Rigidbody>().position = new Vector3
 		(
-			Mathf.Clamp (GetComponent<Rigidbody>().position.x, boundary.xMin, boundary.xMax), 
+			Mathf.Clamp(GetComponent<Rigidbody>().position.x, boundary.xMin, boundary.xMax), 
 			0.0f, 
-			Mathf.Clamp (GetComponent<Rigidbody>().position.z, boundary.zMin, boundary.zMax)
+			Mathf.Clamp(GetComponent<Rigidbody>().position.z, boundary.zMin, boundary.zMax)
 		);
-		
-		GetComponent<Rigidbody>().rotation = Quaternion.Euler (0.0f, 0.0f, GetComponent<Rigidbody>().velocity.x * -tilt);
+
+        GetComponent<Rigidbody>().rotation = Quaternion.Euler(0.0f, 0.0f, GetComponent<Rigidbody>().velocity.x * -tilt);
 	}
 }
